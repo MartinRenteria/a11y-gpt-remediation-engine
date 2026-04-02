@@ -35,6 +35,7 @@ export default function Home() {
               A11y-GPT <span className="text-orange-500 italic">Remediation</span>
             </h1>
           </div>
+        </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-12">
