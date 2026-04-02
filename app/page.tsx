@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import {
@@ -10,16 +8,17 @@ import {
   CheckCircle2,
   AlertCircle,
   Copy,
+  Check,
   Upload,
   RefreshCw,
   Code2
 } from 'lucide-react';
 import ReactDiffViewer from 'react-diff-viewer-continued';
 import { useDropzone } from 'react-dropzone';
-import { remediateComponent, generateAltText, suggestContrastColor } from '../services/gemini';
-import { cn } from '../lib/utils';
+import { remediateComponent, generateAltText, suggestContrastColor } from './services/gemini';
+import { cn } from './lib/utils';
 
-export default function Home() {
+export default function App() {
   const [activeTab, setActiveTab] = useState('doctor');
 
   return (
@@ -34,6 +33,11 @@ export default function Home() {
             <h1 className="text-xl font-bold tracking-tight">
               A11y-GPT <span className="text-orange-500 italic">Remediation</span>
             </h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">v1.0.0-beta</span>
+            <div className="h-4 w-px bg-zinc-800" />
+            <a href="#" className="text-xs text-zinc-400 hover:text-white transition-colors">Documentation</a>
           </div>
         </div>
       </header>
@@ -67,6 +71,9 @@ export default function Home() {
       <footer className="border-t border-zinc-800 py-8 mt-20">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center text-zinc-500 text-sm">
           <p>© 2026 A11y-GPT Remediation Engine. Built for WCAG 2.1 Compliance.</p>
+          <div className="flex gap-6">
+            <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-green-500" /> System Operational</span>
+          </div>
         </div>
       </footer>
     </div>
@@ -93,6 +100,17 @@ function ComponentDoctor() {
   const [code, setCode] = useState('');
   const [result, setResult] = useState<{ violations: string[], fixedCode: string, explanation: string } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy code:', err);
+    }
+  };
 
   const handleRemediate = async () => {
     if (!code.trim()) return;
@@ -148,10 +166,21 @@ function ComponentDoctor() {
               <div className="p-4 border-b border-zinc-800 bg-zinc-900/50 flex items-center justify-between">
                 <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Diff Analysis</span>
                 <button
-                  onClick={() => navigator.clipboard.writeText(result.fixedCode)}
-                  className="text-xs flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors"
+                  onClick={() => handleCopy(result.fixedCode)}
+                  className={cn(
+                    "text-xs flex items-center gap-1.5 transition-all duration-200",
+                    copied ? "text-green-500 font-medium" : "text-zinc-400 hover:text-white"
+                  )}
                 >
-                  <Copy className="w-3 h-3" /> Copy Fixed Code
+                  {copied ? (
+                    <>
+                      <Check className="w-3 h-3" /> Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3 h-3" /> Copy Fixed Code
+                    </>
+                  )}
                 </button>
               </div>
               <div className="max-h-[400px] overflow-auto text-xs">
@@ -213,6 +242,17 @@ function AltTextGenerator() {
   const [image, setImage] = useState<string | null>(null);
   const [altText, setAltText] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy alt text:', err);
+    }
+  };
 
   const onDrop = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -258,7 +298,7 @@ function AltTextGenerator() {
       >
         <input {...getInputProps()} />
         {image ? (
-          <img src={image} alt="Preview" className="h-full w-full object-contain p-4" referrerPolicy="no-referrer" />
+          <img src={image} alt="Preview" className="h-full w-full object-contain p-4" />
         ) : (
           <>
             <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center">
@@ -281,10 +321,13 @@ function AltTextGenerator() {
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500">Generated Alt Text</h3>
             <button
-              onClick={() => navigator.clipboard.writeText(altText)}
-              className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+              onClick={() => handleCopy(altText)}
+              className={cn(
+                "p-2 rounded-lg transition-all duration-200",
+                copied ? "bg-green-500/10 text-green-500" : "hover:bg-zinc-800 text-zinc-400 hover:text-white"
+              )}
             >
-              <Copy className="w-4 h-4 text-zinc-400" />
+              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             </button>
           </div>
           <p className="text-lg leading-relaxed text-zinc-200 italic">"{altText}"</p>
@@ -413,6 +456,19 @@ function ContrastChecker() {
 }
 
 function DevOpsPanel() {
+  const [copiedDocker, setCopiedDocker] = useState(false);
+  const [copiedK8s, setCopiedK8s] = useState(false);
+
+  const handleCopy = async (text: string, setter: (val: boolean) => void) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setter(true);
+      setTimeout(() => setter(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy manifest:', err);
+    }
+  };
+
   const dockerfile = `
 # Multi-stage build for A11y-GPT
 FROM node:20-alpine AS builder
@@ -424,7 +480,7 @@ RUN npm run build
 
 FROM node:20-alpine
 WORKDIR /app
-COPY --from=builder /app/.next ./ .next
+COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
 RUN npm install --production
 EXPOSE 3000
@@ -482,17 +538,41 @@ spec:
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div className="space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-blue-500" /> Dockerfile
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-blue-500" /> Dockerfile
+          </h3>
+          <button
+            onClick={() => handleCopy(dockerfile, setCopiedDocker)}
+            className={cn(
+              "text-[10px] uppercase tracking-widest flex items-center gap-1.5 px-2 py-1 rounded transition-all duration-200",
+              copiedDocker ? "bg-green-500/10 text-green-500" : "text-zinc-500 hover:text-white hover:bg-zinc-800"
+            )}
+          >
+            {copiedDocker ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+            {copiedDocker ? "Copied" : "Copy"}
+          </button>
+        </div>
         <pre className="bg-zinc-900 p-6 rounded-xl border border-zinc-800 text-xs font-mono overflow-auto text-zinc-400 leading-relaxed">
           {dockerfile}
         </pre>
       </div>
       <div className="space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-purple-500" /> Kubernetes Manifest (HPA)
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-purple-500" /> Kubernetes Manifest (HPA)
+          </h3>
+          <button
+            onClick={() => handleCopy(k8sManifest, setCopiedK8s)}
+            className={cn(
+              "text-[10px] uppercase tracking-widest flex items-center gap-1.5 px-2 py-1 rounded transition-all duration-200",
+              copiedK8s ? "bg-green-500/10 text-green-500" : "text-zinc-500 hover:text-white hover:bg-zinc-800"
+            )}
+          >
+            {copiedK8s ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+            {copiedK8s ? "Copied" : "Copy"}
+          </button>
+        </div>
         <pre className="bg-zinc-900 p-6 rounded-xl border border-zinc-800 text-xs font-mono overflow-auto text-zinc-400 leading-relaxed">
           {k8sManifest}
         </pre>
