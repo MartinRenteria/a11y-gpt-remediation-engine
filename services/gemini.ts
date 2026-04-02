@@ -2,11 +2,13 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY || "",
+});
 
 export async function remediateComponent(code: string) {
     const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+        model: "gemini-3-flash-preview",
         contents: [
             {
                 text: `You are an expert in Web Accessibility (WCAG 2.1). 
