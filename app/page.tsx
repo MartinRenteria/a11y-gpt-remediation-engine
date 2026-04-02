@@ -35,12 +35,6 @@ export default function Home() {
               A11y-GPT <span className="text-orange-500 italic">Remediation</span>
             </h1>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">v1.0.0-beta</span>
-            <div className="h-4 w-px bg-zinc-800" />
-            <a href="#" className="text-xs text-zinc-400 hover:text-white transition-colors">Documentation</a>
-          </div>
-        </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-12">
@@ -72,9 +66,6 @@ export default function Home() {
       <footer className="border-t border-zinc-800 py-8 mt-20">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center text-zinc-500 text-sm">
           <p>© 2026 A11y-GPT Remediation Engine. Built for WCAG 2.1 Compliance.</p>
-          <div className="flex gap-6">
-            <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-green-500" /> System Operational</span>
-          </div>
         </div>
       </footer>
     </div>
