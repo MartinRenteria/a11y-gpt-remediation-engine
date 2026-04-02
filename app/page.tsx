@@ -15,8 +15,8 @@ import {
 } from 'lucide-react';
 import ReactDiffViewer from 'react-diff-viewer-continued';
 import { useDropzone } from 'react-dropzone';
-import { remediateComponent, generateAltText, suggestContrastColor } from './services/gemini';
-import { cn } from './lib/utils';
+import { remediateComponent, generateAltText, suggestContrastColor } from '../services/gemini';
+import { cn } from '../lib/utils';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('doctor');
@@ -150,7 +150,15 @@ function ComponentDoctor() {
             className="w-full h-[500px] bg-zinc-900 border border-zinc-800 rounded-xl p-6 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all resize-none"
           />
           <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={() => setCode('')} className="text-zinc-500 hover:text-white p-2">Clear</button>
+            <button
+              onClick={() => {
+                setCode('');
+                setResult(null);
+              }}
+              className="text-zinc-500 hover:text-white p-2 text-xs font-medium transition-colors"
+            >
+              Clear
+            </button>
           </div>
         </div>
       </div>
