@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import * as Tabs from '@radix-ui/react-tabs';
 import {
   Stethoscope,
   Image as ImageIcon,
   Palette,
-  Terminal,
   CheckCircle2,
   AlertCircle,
   Copy,
@@ -25,7 +25,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-orange-500/30">
-      {/* Header */}
       <header className="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -36,11 +35,6 @@ export default function App() {
               A11y-GPT <span className="text-orange-500 italic">Remediation</span>
             </h1>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">v1.0.0-beta</span>
-            <div className="h-4 w-px bg-zinc-800" />
-            <a href="#" className="text-xs text-zinc-400 hover:text-white transition-colors">Documentation</a>
-          </div>
         </div>
       </header>
 
@@ -50,7 +44,6 @@ export default function App() {
             <TabTrigger value="doctor" icon={<Stethoscope className="w-4 h-4" />} label="Component Doctor" />
             <TabTrigger value="alt" icon={<ImageIcon className="w-4 h-4" />} label="Alt-Text Gen" />
             <TabTrigger value="contrast" icon={<Palette className="w-4 h-4" />} label="Contrast Fixer" />
-            <TabTrigger value="devops" icon={<Terminal className="w-4 h-4" />} label="DevOps Manifests" />
           </Tabs.List>
 
           <div className="flex-1">
@@ -63,9 +56,6 @@ export default function App() {
             <Tabs.Content value="contrast" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               <ContrastChecker />
             </Tabs.Content>
-            <Tabs.Content value="devops" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <DevOpsPanel />
-            </Tabs.Content>
           </div>
         </Tabs.Root>
       </main>
@@ -73,9 +63,6 @@ export default function App() {
       <footer className="border-t border-zinc-800 py-8 mt-20">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center text-zinc-500 text-sm">
           <p>© 2026 A11y-GPT Remediation Engine. Built for WCAG 2.1 Compliance.</p>
-          <div className="flex gap-6">
-            <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-green-500" /> System Operational</span>
-          </div>
         </div>
       </footer>
     </div>
@@ -278,6 +265,7 @@ function AltTextGenerator() {
     onDrop,
     accept: { 'image/*': [] },
     multiple: false
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any);
 
   const handleGenerateAlt = async (base64: string, type: string) => {
@@ -308,7 +296,7 @@ function AltTextGenerator() {
       >
         <input {...getInputProps()} />
         {image ? (
-          <img src={image} alt="Preview" className="h-full w-full object-contain p-4" />
+          <Image src={image} alt="Preview" className="h-full w-full object-contain p-4" />
         ) : (
           <>
             <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center">
@@ -340,10 +328,10 @@ function AltTextGenerator() {
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             </button>
           </div>
-          <p className="text-lg leading-relaxed text-zinc-200 italic">"{altText}"</p>
+          <p className="text-lg leading-relaxed text-zinc-200 italic">&quot;{altText}&ldquo;</p>
           <div className="pt-4 border-t border-zinc-800">
             <code className="text-xs text-orange-500">
-              &lt;img src="..." alt="{altText}" /&gt;
+              &lt;img src=&ldquo;...&ldquo; alt=&quot;{altText}&quot; /&gt;
             </code>
           </div>
         </div>
@@ -460,132 +448,6 @@ function ContrastChecker() {
             </div>
           </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-function DevOpsPanel() {
-  const [copiedDocker, setCopiedDocker] = useState(false);
-  const [copiedK8s, setCopiedK8s] = useState(false);
-
-  const handleCopy = async (text: string, setter: (val: boolean) => void) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setter(true);
-      setTimeout(() => setter(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy manifest:', err);
-    }
-  };
-
-  const dockerfile = `
-# Multi-stage build for A11y-GPT
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package*.json ./
-RUN npm install --production
-EXPOSE 3000
-CMD ["npm", "start"]
-  `.trim();
-
-  const k8sManifest = `
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: a11y-gpt-engine
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: a11y-gpt
-  template:
-    metadata:
-      labels:
-        app: a11y-gpt
-    spec:
-      containers:
-      - name: engine
-        image: a11y-gpt:latest
-        ports:
-        - containerPort: 3000
-        resources:
-          requests:
-            cpu: "100m"
-            memory: "256Mi"
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: a11y-gpt-hpa
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: a11y-gpt-engine
-  minReplicas: 2
-  maxReplicas: 10
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  `.trim();
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-blue-500" /> Dockerfile
-          </h3>
-          <button
-            onClick={() => handleCopy(dockerfile, setCopiedDocker)}
-            className={cn(
-              "text-[10px] uppercase tracking-widest flex items-center gap-1.5 px-2 py-1 rounded transition-all duration-200",
-              copiedDocker ? "bg-green-500/10 text-green-500" : "text-zinc-500 hover:text-white hover:bg-zinc-800"
-            )}
-          >
-            {copiedDocker ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-            {copiedDocker ? "Copied" : "Copy"}
-          </button>
-        </div>
-        <pre className="bg-zinc-900 p-6 rounded-xl border border-zinc-800 text-xs font-mono overflow-auto text-zinc-400 leading-relaxed">
-          {dockerfile}
-        </pre>
-      </div>
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-purple-500" /> Kubernetes Manifest (HPA)
-          </h3>
-          <button
-            onClick={() => handleCopy(k8sManifest, setCopiedK8s)}
-            className={cn(
-              "text-[10px] uppercase tracking-widest flex items-center gap-1.5 px-2 py-1 rounded transition-all duration-200",
-              copiedK8s ? "bg-green-500/10 text-green-500" : "text-zinc-500 hover:text-white hover:bg-zinc-800"
-            )}
-          >
-            {copiedK8s ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-            {copiedK8s ? "Copied" : "Copy"}
-          </button>
-        </div>
-        <pre className="bg-zinc-900 p-6 rounded-xl border border-zinc-800 text-xs font-mono overflow-auto text-zinc-400 leading-relaxed">
-          {k8sManifest}
-        </pre>
       </div>
     </div>
   );
