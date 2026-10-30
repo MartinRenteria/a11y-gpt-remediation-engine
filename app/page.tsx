@@ -138,16 +138,15 @@ function ComponentDoctor() {
             placeholder="// Paste your React component here..."
             className="w-full h-[500px] bg-zinc-900 border border-zinc-800 rounded-xl p-6 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all resize-none"
           />
-          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={() => {
-                setCode('');
-                setResult(null);
-              }}
-              className="text-zinc-500 hover:text-white p-2 text-xs font-medium transition-colors"
-            >
-              Clear
-            </button>
+          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">            <button
+            onClick={() => {
+              setCode('');
+              setResult(null);
+            }}
+            className="text-zinc-500 hover:text-white p-2 text-xs font-medium transition-colors"
+          >
+            Clear
+          </button>
           </div>
         </div>
       </div>
