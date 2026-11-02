@@ -61,7 +61,7 @@ export default function App() {
       </main>
 
       <footer className="border-t border-zinc-800 py-8 mt-20">
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center text-zinc-500 text-sm">
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center text-zinc-400 text-sm">
           <p>© 2026 A11y-GPT Remediation Engine. Built for WCAG 2.1 Compliance.</p>
         </div>
       </footer>
@@ -76,7 +76,7 @@ function TabTrigger({ value, icon, label }: { value: string, icon: React.ReactNo
       className={cn(
         "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
         "data-[state=active]:bg-zinc-800 data-[state=active]:text-white data-[state=active]:shadow-sm",
-        "data-[state=inactive]:text-zinc-500 data-[state=inactive]:hover:text-zinc-300"
+        "data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-white"
       )}
     >
       {icon}
@@ -143,7 +143,7 @@ function ComponentDoctor() {
               setCode('');
               setResult(null);
             }}
-            className="text-zinc-500 hover:text-white p-2 text-xs font-medium transition-colors"
+            className="text-zinc-400 hover:text-white p-2 text-xs font-medium transition-colors"
           >
             Clear
           </button>
@@ -224,8 +224,8 @@ function ComponentDoctor() {
             </div>
           </div>
         ) : (
-          <div className="h-[500px] bg-zinc-900/30 border border-dashed border-zinc-800 rounded-xl flex flex-col items-center justify-center text-zinc-600 gap-4">
-            <Stethoscope className="w-12 h-12 opacity-20" />
+          <div className="h-[500px] bg-zinc-900/30 border border-dashed border-zinc-800 rounded-xl flex flex-col items-center justify-center text-zinc-400 gap-4">
+            <Stethoscope className="w-12 h-12 opacity-20" aria-hidden="true" />
             <p className="text-sm">Paste code and run analysis to see remediation</p>
           </div>
         )}
@@ -283,7 +283,7 @@ function AltTextGenerator() {
     <div className="max-w-3xl mx-auto space-y-8">
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-bold">Alt-Text Generator</h2>
-        <p className="text-zinc-500">Upload an image to generate context-aware accessibility descriptions.</p>
+        <p className="text-zinc-400">Upload an image to generate context-aware accessibility descriptions.</p>
       </div>
 
       <div
@@ -316,7 +316,7 @@ function AltTextGenerator() {
       {altText && !loading && (
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 space-y-4 animate-in zoom-in-95 duration-300">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500">Generated Alt Text</h3>
+            <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400">Generated Alt Text</h3>
             <button
               onClick={() => handleCopy(altText)}
               className={cn(
@@ -362,12 +362,12 @@ function ContrastChecker() {
       <div className="space-y-8">
         <div className="space-y-4">
           <h2 className="text-xl font-bold">Contrast Fixer</h2>
-          <p className="text-sm text-zinc-500">AI-powered color suggestions that maintain brand identity while passing WCAG AA/AAA.</p>
+          <p className="text-sm 40">AI-powered color suggestions that maintain brand identity while passing WCAG AA/AAA.</p>
         </div>
 
         <div className="space-y-6">
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase text-zinc-500">Foreground Color</label>
+            <label className="text-xs font-bold uppercase 40">Foreground Color</label>
             <div className="flex gap-4">
               <input
                 type="color"
@@ -385,7 +385,7 @@ function ContrastChecker() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase text-zinc-500">Background Color</label>
+            <label className="text-xs font-bold uppercase 40">Background Color</label>
             <div className="flex gap-4">
               <input
                 type="color"
@@ -435,7 +435,7 @@ function ContrastChecker() {
               />
               <div>
                 <p className="font-mono text-lg">{suggestion.suggestedColor}</p>
-                <p className="text-xs text-zinc-500">{suggestion.explanation}</p>
+                <p className="text-xs 40">{suggestion.explanation}</p>
               </div>
             </div>
 
