@@ -1,23 +1,19 @@
 "use client";
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import * as Tabs from '@radix-ui/react-tabs';
 import {
   Stethoscope,
   Image as ImageIcon,
   Palette,
-  Copy,
-  Check,
-  Upload,
   RefreshCw,
 } from 'lucide-react';
-import { useDropzone } from 'react-dropzone';
-import { generateAltText, suggestContrastColor } from '../../services/gemini';
+import {suggestContrastColor } from '../../services/gemini';
 import { cn } from '../../lib/utils';
 
 // Components
 import ComponentDoctor from '../components/ComponentDoctor';
+import AltTextGenerator from '../components/AltTextGenerator';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('doctor');
@@ -80,111 +76,6 @@ function TabTrigger({ value, icon, label }: { value: string, icon: React.ReactNo
       {icon}
       {label}
     </Tabs.Trigger>
-  );
-}
-
-function AltTextGenerator() {
-  const [image, setImage] = useState<string | null>(null);
-  const [altText, setAltText] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy alt text:', err);
-    }
-  };
-
-  const onDrop = (acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImage(reader.result as string);
-      handleGenerateAlt(reader.result as string, file.type);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: { 'image/*': [] },
-    multiple: false
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
-
-  const handleGenerateAlt = async (base64: string, type: string) => {
-    setLoading(true);
-    try {
-      const res = await generateAltText(base64, type);
-      setAltText(res || '');
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="max-w-3xl mx-auto space-y-8">
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold">Alt-Text Generator</h2>
-        <p className="text-zinc-400">Upload an image to generate context-aware accessibility descriptions.</p>
-      </div>
-
-      <div
-        {...getRootProps()}
-        className={cn(
-          "h-64 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-4 transition-all cursor-pointer",
-          isDragActive ? "border-orange-500 bg-orange-500/5" : "border-zinc-800 bg-zinc-900/50 hover:border-zinc-700"
-        )}
-      >
-        <input {...getInputProps()} />
-        {image ? (
-          <Image width={100} height={100} src={image} alt="Preview" className="h-full w-full object-contain p-4" />
-        ) : (
-          <>
-            <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center">
-              <Upload className="w-6 h-6 text-zinc-400" />
-            </div>
-            <p className="text-sm text-zinc-400">Drag & drop image here, or click to select</p>
-          </>
-        )}
-      </div>
-
-      {loading && (
-        <div className="flex items-center justify-center gap-3 text-orange-500 animate-pulse">
-          <RefreshCw className="w-5 h-5 animate-spin" />
-          <span className="text-sm font-medium">Analyzing visual context...</span>
-        </div>
-      )}
-
-      {altText && !loading && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 space-y-4 animate-in zoom-in-95 duration-300">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400">Generated Alt Text</h3>
-            <button
-              onClick={() => handleCopy(altText)}
-              className={cn(
-                "p-2 rounded-lg transition-all duration-200",
-                copied ? "bg-green-500/10 text-green-500" : "hover:bg-zinc-800 text-zinc-400 hover:text-white"
-              )}
-            >
-              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-            </button>
-          </div>
-          <p className="text-lg leading-relaxed text-zinc-200 italic">&quot;{altText}&ldquo;</p>
-          <div className="pt-4 border-t border-zinc-800">
-            <code className="text-xs text-orange-500">
-              &lt;img src=&ldquo;...&ldquo; alt=&quot;{altText}&quot; /&gt;
-            </code>
-          </div>
-        </div>
-      )}
-    </div>
   );
 }
 

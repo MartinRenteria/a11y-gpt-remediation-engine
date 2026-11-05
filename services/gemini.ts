@@ -47,6 +47,10 @@ export async function remediateComponent(code: string) {
 }
 
 export async function generateAltText(base64Image: string, mimeType: string) {
+    const cleanBase64 = base64Image.includes(",")
+        ? base64Image.split(",")[1]
+        : base64Image;
+
     const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: [
@@ -54,19 +58,37 @@ export async function generateAltText(base64Image: string, mimeType: string) {
                 parts: [
                     {
                         inlineData: {
-                            data: base64Image.split(",")[1],
+                            data: cleanBase64,
                             mimeType: mimeType,
                         },
                     },
                     {
-                        text: "Describe this image for an alt text attribute. Be concise but descriptive. Provide context if it looks like a UI element or a meaningful photo.",
+                        text: `Analyze this image and generate context-aware alt text for accessibility (WCAG 2.1). 
+Provide a JSON response with:
+1. 'altText': A concise, descriptive, screen-reader friendly alt text string.
+2. 'category': The type of image detected (e.g., 'UI Element', 'Photograph', 'Icon', 'Chart').`,
                     },
                 ],
             },
         ],
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                    altText: { type: Type.STRING },
+                    category: { type: Type.STRING },
+                },
+                required: ["altText", "category"],
+            },
+        },
     });
 
-    return response.text;
+    const parsed = JSON.parse(response.text || "{}");
+    return {
+        altText: String(parsed.altText || "Description unavailable."),
+        category: String(parsed.category || "General"),
+    };
 }
 
 export async function suggestContrastColor(fg: string, bg: string) {
