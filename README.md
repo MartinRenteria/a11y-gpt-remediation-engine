@@ -41,7 +41,3 @@ GitHub Actions (`.github/workflows/ci.yml`) lints and builds the project on ever
 - [ ] Unit tests for the contrast calculation logic
 - [ ] Rate limiting on API routes
 - [ ] Containerization (Docker) and Kubernetes deployment
-
-## License
-
-MIT (add a `LICENSE` file).
